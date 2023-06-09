@@ -1,0 +1,91 @@
+* {
+    margin: 0px auto;
+    padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    width: 70%;
+    background-color: #eee;
+
+}
+
+#alertbox,
+#alertboxLogin{
+    display: block;
+    width: 30%;
+    height: 60px;
+    background: rgba(255, 0, 0, 0.745);
+    text-align: center;
+    line-height: 40px;
+    border-radius: 10px;
+    z-index: 0;
+    transition: all 1s;
+    position: relative;
+    transform: translateY(100px);
+}
+
+#alertbox p {
+    color: white;
+    font-size: 15px;
+}
+
+h1 {
+    display: block;
+    text-align: center;
+    margin: 50px;
+}
+
+#form_login,
+#form_register {
+    display: block;
+    width: 30%;
+    margin: 15px auto;
+    border: 3px solid grey;
+    background-color: dodgerblue;
+    border-radius: 10px;
+    z-index: 1;
+    position: relative;
+
+}
+
+#form_login ul,
+#form_register ul {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    list-style: none;
+}
+
+#form_login ul li,
+#form_register ul li {
+    margin: 20px;
+}
+
+#form_login ul li input,
+#form_register ul li input {
+    display: flex;
+    width: 95%;
+    height: 40px;
+    padding: 5px;
+    font-size: 25px;
+    border-radius: 10px;
+}
+
+.submit {
+    display: block;
+    width: 60%;
+    text-align: center;
+    height: 40px;
+    padding: 5px;
+    font-size: 25px;
+    border-radius: 10px;
+}
+
+.submit:hover {
+    background: rgb(10, 184, 10);
+}
+
+.submit:active {
+    background: green;
+}
