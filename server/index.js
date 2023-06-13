@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser')
 const app = express()
 const port = 8000
 const cors = require('cors')
+const mysql = require('mysql2')
 
 const path = require('path')
 
@@ -33,6 +34,43 @@ app.get('/', (req, res) => {
     res.send('Hola con un GET')
 })
 
+
+app.post('/registro', (req, res) => {
+
+    const nombre = req.body["nombre"]
+    const contra = req.body["contra"]
+    console.log(nombre + contra)
+    if (!nombre || !contra) {
+        res.sendStatus(400)
+
+    } else {
+        const connection = mysql.createConnection({
+            host: 'localhost',
+            user: 'root',
+            //password: ''
+            database: 'master',
+            port: 8001
+        })
+
+        /*
+        connection.query("SELECT * FROM `usuario`", (err, results, fields) =>{
+            console.log(err)
+            console.log("---------")
+            console.log(results)
+            console.log("---------")
+            console.log(fields)
+    
+            connection.end()
+        })*/
+
+        connection.query("INSERT INTO `usuario` (nombre, pass) VALUES ('" + nombre + "', '" + contra + "') ", (err, results, fields) => {
+            console.log(results)
+        })
+
+        res.sendStatus(200);
+    }
+
+})
 
 app.post('/login', (req, res,) => {
     res.setHeader("Access-Control-Allow-Origin", "*")
