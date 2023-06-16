@@ -4,7 +4,8 @@ const cookieParser = require('cookie-parser')
 const app = express()
 const port = 8000
 const cors = require('cors')
-const mysql = require('mysql2')
+//const mysql = require('mysql2')
+const mysql = require('mysql2/promise')
 
 const path = require('path')
 
@@ -35,12 +36,15 @@ app.get('/', (req, res) => {
 })
 
 
-app.post('/registro', (req, res) => {
+app.post('/registro', async (req, res) => {
 
     const nombre = req.body["nombre"]
     const contra = req.body["contra"]
-    console.log(nombre + contra)
+    const espublico = req.body["espublico"]
+
     if (!nombre || !contra) {
+        console.log(nombre + contra)
+
         res.sendStatus(400)
 
     } else {
@@ -49,10 +53,20 @@ app.post('/registro', (req, res) => {
             user: 'root',
             //password: ''
             database: 'master',
-            port: 8001
+            port: 8001,
+            // multipleStatements: true (esto es para poder realizar más de una sentencia)
         })
 
+        //const connection = await mysql.createConnection({
+        //    host: 'localhost',
+        //    user: 'root',
+        //    //password: ''
+        //    database: 'master',
+        //    port: 8001
+        //})
+
         /*
+
         connection.query("SELECT * FROM `usuario`", (err, results, fields) =>{
             console.log(err)
             console.log("---------")
@@ -63,13 +77,65 @@ app.post('/registro', (req, res) => {
             connection.end()
         })*/
 
-        connection.query("INSERT INTO `usuario` (nombre, pass) VALUES ('" + nombre + "', '" + contra + "') ", (err, results, fields) => {
-            console.log(results)
+        /* 
+            - COMPRUEBO SI UN USUARIO EXISTE
+            - SI NO EXISTE INTRODUZCO EL USUARIO
+            - DEVUELVO UNA LISTA DE TODOS LOS USUARIOS
+        */
+
+         E J E M P L O   C O N   C A L L B A C K S
+        connection.query(`SELECT * FROM usuario WHERE nombre = ? AND espublico = ?;`, [nombre, 1], (err, results) => {
+            if (err) throw new Error()
+        
+            if (results.length === 0) {
+                // Introduzco el usuario
+                connection.query("INSERT INTO `usuario` (nombre, pass) VALUES (?,?)", [nombre, contra], (err, results) => {
+                    if (err) throw new Error()
+        
+                    console.log(results)
+        
+                    connection.query(`SELECT * FROM usuario`, [username], (err, results) => {
+                        if (err) throw new Error()
+        
+                        console.log(results)
+                    })
+                })
+            }
         })
+
+
+        // E J E M P L O   C O N   P R O M E S A S
+        //const usuarioExiste = await connection.execute(`SELECT * FROM usuario WHERE nombre = ? AND espublico = 1;`, [nombre]);
+        //console.log(usuarioExiste)
+        //
+        //const insercion = await connection.execute(`INSERT INTO usuario (nombre, pass, espublico) VALUES (?,?,?)`, [nombre, contra, espublico]);
+        //console.log(insercion)
+        //
+        //
+        //const usuariosNuevos = await connection.execute(`SELECT * FROM usuario`);
+        //console.log(usuariosNuevos)
+
+
+
+        // ESTO ES SOLO PARA APRENDER, ES VULNERABLE A SQL INJECTION
+        //console.log("INSERT INTO `usuario` (nombre, pass) VALUES ('" + nombre + "', '" + contra + "') ")
+        //connection.query("INSERT INTO `usuario` (nombre, pass) VALUES ('" + nombre + "', '" + contra + "') ", (err, results, fields) => {
+        //    console.log(err)
+        //    console.log(results)
+        //})
+
+        //connection.query(`SELECT * FROM usuario WHERE espublico = 1;`, (err, results) => {
+        //    console.log(err)
+        //    console.log(results)
+        //})
+
+        //connection.query("INSERT INTO `usuario` (nombre, pass, espublico) VALUES (?,?,?)", [nombre, contra, espublico], (err, results) => {
+        //    console.log(err)
+        //    console.log(results)
+        //})
 
         res.sendStatus(200);
     }
-
 })
 
 app.post('/login', (req, res,) => {
