@@ -83,7 +83,7 @@ app.post('/registro', async (req, res) => {
             - DEVUELVO UNA LISTA DE TODOS LOS USUARIOS
         */
 
-         E J E M P L O   C O N   C A L L B A C K S
+        //E J E M P L O   C O N   C A L L B A C K S
         connection.query(`SELECT * FROM usuario WHERE nombre = ? AND espublico = ?;`, [nombre, 1], (err, results) => {
             if (err) throw new Error()
         
