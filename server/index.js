@@ -86,17 +86,17 @@ app.post('/registro', async (req, res) => {
         //E J E M P L O   C O N   C A L L B A C K S
         connection.query(`SELECT * FROM usuario WHERE nombre = ? AND espublico = ?;`, [nombre, 1], (err, results) => {
             if (err) throw new Error()
-        
+
             if (results.length === 0) {
                 // Introduzco el usuario
                 connection.query("INSERT INTO `usuario` (nombre, pass) VALUES (?,?)", [nombre, contra], (err, results) => {
                     if (err) throw new Error()
-        
+
                     console.log(results)
-        
+
                     connection.query(`SELECT * FROM usuario`, [username], (err, results) => {
                         if (err) throw new Error()
-        
+
                         console.log(results)
                     })
                 })
@@ -164,6 +164,81 @@ app.get('/acceso', validarUsuario, (req, res) => {
         message: "ESTÁS DENTRO DEL SITIO SEGURO"
     })
 });
+
+
+
+
+async function abrirConex() {
+    const connection = await mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        database: 'master',
+        port: 8001,
+    })
+
+    return connection
+}
+
+app.get('/crud/:id', async (req, res) => {
+
+    const connection = await abrirConex()
+
+    const id = req.params["id"]
+
+    const [usuarios, fields] = await connection.execute("SELECT * FROM `usuario` WHERE id = ?", [id])
+
+    res.status(200).send({
+        usuario: usuarios[0]
+    })
+
+    await connection.end()
+})
+
+
+app.post('/crud', async (req, res) => {
+    const connection = await abrirConex()
+
+    const nombre = req.body["nombre"]
+    const contra = req.body["contra"]
+    const email = req.body["email"]
+    const espublico = Boolean(req.body["espublico"])
+
+    const regex = /(\w+)@(\w+).(\w+)/
+
+    const isValidNombre = nombre.length < 20 && nombre.length > 0
+    const isValidContra = contra.length < 20 && contra.length > 0
+    const isValidMail = regex.test(email) && email.length < 20 && email.length > 0
+
+    if (!isValidNombre || !isValidContra || !isValidMail) {
+        res.sendStatus(400)
+
+    } else {
+        await connection.execute("INSERT INTO `usuario`(nombre,pass,email,espublico) VALUES(?,?,?,?)", [nombre, contra, email, espublico])
+
+        res.sendStatus(201)
+
+        await connection.end()
+    }
+
+})
+
+app.put('/crud', async (req, res) => {
+    const connection = await abrirConex()
+
+
+    await connection.end()
+
+})
+
+app.delete('/crud', async (req, res) => {
+    const connection = await abrirConex()
+
+
+    await connection.end()
+
+})
+
+
 
 
 app.listen(port, () => {
